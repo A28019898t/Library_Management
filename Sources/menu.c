@@ -7,11 +7,11 @@
 #include "..\Headers\borrowReturn.h"
 
 void print5Choices(char* input[], void f1(), void f2(), void f3(), void f4(), void f5()) {
-    system("cls");
     
     int choice;
     
     do {
+        system("cls");
         printf("\n");
         printf("%s\n", input[0]);
         for (int i = 1; i < 6; i++) {
@@ -46,17 +46,15 @@ void print5Choices(char* input[], void f1(), void f2(), void f3(), void f4(), vo
             default:
                 printf("Nhap sai lua chon, Moi ban nhap lai\n");
         }
-        system("pause");
-        system("cls");
     } while (choice != 0);
 }
 
 void print6Choices(char* input[], void f1(), void f2(), void f3(), void f4(), void f5(), void f6()) {
-    system("cls");
     
     int choice;
     
     do {
+        system("cls");
         printf("\n");
         printf("%s\n", input[0]);
         for (int i = 1; i < 7; i++) {
@@ -95,7 +93,6 @@ void print6Choices(char* input[], void f1(), void f2(), void f3(), void f4(), vo
                 printf("Nhap sai lua chon, Moi ban nhap lai\n");
         }
         system("pause");
-        system("cls");
     } while (choice != 0);
 }
 
@@ -108,9 +105,9 @@ void readerMenu() {
                                         "Chinh sua thong tin mot doc gia", 
                                         "Xoa thong tin mot doc gia", 
                                         "Tim kiem doc gia theo CMND", 
-                                        "Tim kiem sach theo ho ten", 
+                                        "Tim kiem doc gia theo ho ten", 
                                         "Quay lai"};
-    print6Choices(ReadersManagement,viewAllReaders, addReader, editReaderInfor, deleteReader, searchReaderByCMND, searchReaderByName);   
+    print6Choices(ReadersManagement,viewAllReaders, addReader, editReaderInfor, deleteReader, searchReaderByCIC, searchReaderByName);   
 }
 
 // Hiển thị menu sách

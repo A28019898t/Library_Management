@@ -22,6 +22,11 @@ void intToString(char* str, int num) {
     sprintf(str, "%d", num);
 }
 
+// Hàm chuyển số thành chuỗi với độ dài cố định (padding số 0)
+void intToPaddedString(char* dest, int num, int width) {
+    sprintf(dest, "%0*d", width, num); // %0*d: padding số 0 bên trái, width là độ dài
+}
+
 // kiểm tra chuỗi ký tự có là đại diện cho só không
 int isNumber(char* str) {
     for (int i = 0; i < strlen(str); i++) {
@@ -90,11 +95,11 @@ void inputDay(char* date) {
     int valid = 1;
     do {
 
-        printf("Nhap ngay: ");
+        printf("\tNhap ngay: ");
         scanf("%d", &day);
-        printf("Nhap thang: ");
+        printf("\tNhap thang: ");
         scanf("%d", &month);
-        printf("Nhap nam: ");
+        printf("\tNhap nam: ");
         scanf("%d", &year);
         valid = isDate(day, month, year);
         if(!valid) {
@@ -137,9 +142,11 @@ void getToday(char* str) {
 
 // Chuyển chuổi char thành in thường
 void convertToLower(char* source, char* destination) {
-    for (int i = 0; i < strlen(source); i++) {
+    int i;
+    for (i = 0; i < strlen(source); i++) {
         destination[i] = tolower(source[i]);
     }
+    destination[i] = '\0';
 }
 
 // Hàm nhập dữ liệu string
@@ -227,4 +234,43 @@ void getDateFromKDays(char* date, char* result, int kDays) {
     }
 
     getDate(result, day, month, year);
+}
+
+// Tìm thông tin qua việc lọc dữ liệu từ mảng cẩn tìm và dữ liệu mảng
+int findItemByStr(char* str, char* arr[], int rows) {
+    char source[20];
+    char des[20];
+    int saveIndex[20];
+    int index = 0;
+    int valid;
+
+    printf("%s", str);
+    fgets(source, sizeof(source), stdin);
+    source[strcspn(source, "\n")] = '\0';
+
+    convertToLower(source, des);
+
+    for (int i = 0; i < rows; i++) {
+        char temp[20];
+        convertToLower(arr[i], temp);
+
+        valid = findSubString(des, temp);
+
+        if (valid != -1) {
+            saveIndex[index++] = i;
+
+            // hiển thị ra màn hình
+            printf("[%d]: %s\n", index, arr[i]);
+        }
+
+    }
+
+    if(index == 0) {
+        return -1;
+    } else {
+        int choice;
+        printf("Chon: ");
+        scanf("%d", &choice);
+        return saveIndex[choice - 1];
+    }
 }
