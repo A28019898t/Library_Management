@@ -1,537 +1,431 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+#include <stdio.h>              // Thư viện chuẩn cho nhập/xuất dữ liệu
+#include <stdlib.h>             // Thư viện chuẩn cho quản lý bộ nhớ và hàm hệ thống
+#include <string.h>             // Thư viện xử lý chuỗi ký tự
+#include <ctype.h>              // Thư viện xử lý ký tự (isalnum, tolower, v.v.)
 
-#include "..\Headers\reader.h"
-#include "..\Headers\data.h"
-#include "..\Headers\utils.h"
+#include "..\Headers\reader.h"  // File header chứa khai báo hàm quản lý độc giả
+#include "..\Headers\data.h"    // File header chứa định nghĩa dữ liệu và mảng toàn cục
+#include "..\Headers\utils.h"   // File header chứa các hàm tiện ích (getDateFromKMonths, isNumber, v.v.)
 
 // 1. QUẢN LÝ ĐỌC GIẢ
 
 // 1.1. XEM DANH SÁCH ĐỘC GIẢ TRONG THƯ VIỆN
 
-// Hiển thị hàng tiêu đề
-void viewReaderHeader() {
-    printf("%-8s", "id");
-    printf("%-28s", "Ho va ten");
-    printf("%-14s", "CMND/CCCD");
-    printf("%-12s", "Ngay sinh");
-    printf("%-12s", "Gioi tinh");
-    printf("%-28s", "Email");
-    printf("%-35s", "Dia chi");
-    printf("%-15s", "Ngay lap the");
-    printf("%-15s", "Ngay het han the");
-    printf("\n");
+void viewReaderHeader() {       // Hiển thị tiêu đề danh sách độc giả
+    printf("%-8s", "id");       // Cột ID: 8 ký tự, căn trái
+    printf("%-28s", "Ho va ten"); // Cột Họ và tên: 28 ký tự, căn trái
+    printf("%-14s", "CMND/CCCD"); // Cột CMND/CCCD: 14 ký tự, căn trái
+    printf("%-12s", "Ngay sinh"); // Cột Ngày sinh: 12 ký tự, căn trái
+    printf("%-12s", "Gioi tinh"); // Cột Giới tính: 12 ký tự, căn trái
+    printf("%-28s", "Email");     // Cột Email: 28 ký tự, căn trái
+    printf("%-35s", "Dia chi");   // Cột Địa chỉ: 35 ký tự, căn trái
+    printf("%-15s", "Ngay lap the"); // Cột Ngày lập thẻ: 15 ký tự, căn trái
+    printf("%-15s", "Ngay het han the"); // Cột Ngày hết hạn thẻ: 15 ký tự, căn trái
+    printf("\n");                 // Xuống dòng sau khi in tiêu đề
 }
 
-// Hiển thị 1 đọc giả dựa trên index truyền vào
-void viewReader(int index) {
-    printf("%-8s", IDS[index]); // id
-    printf("%-28s", NAMES[index]); // Ho va ten
-    printf("%-14s", CIC_NUMBERS[index]); // CMND/CCCD
-    printf("%-12s", BIRTHDAYS[index]); // Ngay sinh
-    printf("%-12s", (GENDERS[index] == 1) ? "Nam" : "Nu"); // Gioi tinh
-    printf("%-28s", EMAILS[index]); // Email
-    int distance1 = strlen(DISTRICTS[ADDRESSES_DISTRICTS[index]]);
-    int distance2 = 35 - distance1 - 2;
-
-    printf("%-*s, %-*s", distance1, DISTRICTS[ADDRESSES_DISTRICTS[index]], distance2, PROVINCES[ADDRESSES_PROVINCES[index]]); // Dia chi
-    printf("%-15s", ISSUE_DATES[index]); // Ngay lap the
-    char expiryDate[11];
-    getDateFromKMonths(expiryDate, ISSUE_DATES[index], 48);
-    printf("%-15s", expiryDate); // Ngay het han the
-    printf("\n");
+void viewReader(int index) {    // Hiển thị thông tin một độc giả dựa trên chỉ số
+    printf("%-8s", IDS[index]); // In ID độc giả từ mảng IDS
+    printf("%-28s", NAMES[index]); // In tên độc giả từ mảng NAMES
+    printf("%-14s", CIC_NUMBERS[index]); // In CMND/CCCD từ mảng CIC_NUMBERS
+    printf("%-12s", BIRTHDAYS[index]); // In ngày sinh từ mảng BIRTHDAYS
+    printf("%-12s", (GENDERS[index] == 1) ? "Nam" : "Nu"); // In giới tính: 1-Nam, 0-Nữ từ GENDERS
+    printf("%-28s", EMAILS[index]); // In email từ mảng EMAILS
+    
+    int distance1 = strlen(DISTRICTS_DB[DISTRICTS[index]]); // Độ dài tên huyện/quận
+    int distance2 = 35 - distance1 - 2; // Độ dài còn lại cho tỉnh, trừ 2 ký tự ", "
+    printf("%-*s, %-*s", distance1, DISTRICTS_DB[DISTRICTS[index]], distance2, PROVINCES_DB[PROVINCES[index]]); // In địa chỉ: huyện, tỉnh
+    printf("%-15s", ISSUE_DATES[index]); // In ngày lập thẻ từ mảng ISSUE_DATES
+    
+    char expiryDate[11];         // Chuỗi lưu ngày hết hạn thẻ (DD/MM/YYYY)
+    getDateFromKMonths(expiryDate, ISSUE_DATES[index], 48); // Tính ngày hết hạn: +48 tháng từ ngày lập thẻ
+    printf("%-15s", expiryDate); // In ngày hết hạn thẻ
+    printf("\n");                // Xuống dòng sau khi in thông tin độc giả
 }
 
-// Hiển thị toàn bộ đọc giả
-void viewAllReaders() {
-    viewReaderHeader();
-
-    for(int i = 0; i < NUMBER_OF_READERS; i++) {
-        viewReader(i);
+void viewAllReaders() {         // Hiển thị toàn bộ danh sách độc giả
+    viewReaderHeader();         // Gọi hàm in tiêu đề
+    for (int i = 0; i < NUMBER_OF_READERS; i++) { // Duyệt qua tất cả độc giả
+        viewReader(i);          // Gọi hàm in thông tin từng độc giả
     }
 }
 
-// 1.2 THÊM ĐỘC GIẢ
+// 1.2. THÊM ĐỘC GIẢ
 
-// Hàm sinh mã độc giả
-void generateCodeReader(char* code, const char* lastReaderID) {
-    // Kiểm tra lastReaderID hợp lệ
-    if (lastReaderID == NULL || strlen(lastReaderID) < 3 || strncmp(lastReaderID, "DG", 2) != 0) {
-        strcpy(code, "DG0001"); // Mã mặc định nếu không có độc giả trước đó
+void generateCodeReader(char* code, const char* lastReaderID) { // Sinh mã ID độc giả mới
+    if (lastReaderID == NULL || strlen(lastReaderID) < 3 || strncmp(lastReaderID, "DG", 2) != 0) { // Kiểm tra ID cuối cùng hợp lệ
+        strcpy(code, "DG0001"); // Nếu không hợp lệ, trả về mã mặc định
         return;
     }
-
-    // Lấy phần số từ lastReaderID (bỏ "DG")
-    int num;
-    sscanf(lastReaderID + 2, "%d", &num);
-    num++; // Tăng số lên 1
-
-    // Giới hạn số tối đa (ví dụ: 9999 cho mã 6 ký tự)
-    if (num > 9999) {
-        strcpy(code, "DG9999"); // Giới hạn tối đa
-        printf("Canh bao: Da dat gioi han ma doc gia!\n");
+    
+    int num;                // Số thứ tự trong ID
+    sscanf(lastReaderID + 2, "%d", &num); // Lấy phần số từ ID (bỏ "DG")
+    num++;                  // Tăng số thứ tự lên 1
+    
+    if (num > 9999) {       // Kiểm tra vượt quá giới hạn mã (DG9999)
+        strcpy(code, "DG9999"); // Gán mã tối đa
+        printf("Canh bao: Da dat gioi han ma doc gia!\n"); // Thông báo cảnh báo
         return;
     }
-
-    // Tạo mã mới
-    char temp[5]; // Đủ cho 4 chữ số (0001 -> 9999)
-    intToPaddedString(temp, num, 4); // Chuyển thành chuỗi 4 chữ số, padding 0
-    strcpy(code, "DG");              // Prefix
-    strcat(code, temp);              // Nối số vào
-}
-
-// Hàm nhập tên đọc giả(tên đọc giả, kích thước)
-void inputName(char* name, int size) {
-    getchar();
-
-    printf("Ho va ten: ");
-    fgets(name, size, stdin);
-    name[strcspn(name, "\n")] = '\0';
-}
-
-// Hàm nhập CMND/CCCD(CMND, kích thước)
-void inputCIC(char* cic, int size) {
-    int valid;
     
-    do {
-        int index = 0;
-        valid = 1;
-        printf("CMND/CCCD: ");
-        fgets(cic, size, stdin); // kiem tra tai sao khong nhap duoc bang bien cmnd
-        cic[strcspn(cic, "\n")] = '\0'; // đổi ký tự \n thành \0 kết thúc chuỗi
-
-            if (!isNumber(cic)) {
-                valid = 0;
-                index++;
-                printf("CMND/CCCD phai la so\n");
-                continue;
-            }
-
-            if (findReaderByCIC(cic) != -1) {
-                valid = 0;
-                printf("CMND/CCCD da ton tai trong thu vien\n");
-                continue;
-            }
-
-            switch (strlen(cic)) {
-                case 9: 
-                case 12:
-                    break;
-                default:
-                    valid = 0;
-                    printf("CMND co 9 chu so, CCCD co 12 chu so\n");
-            }
-
-            // if (!valid) std::wcout << RESET << std::endl;
-
-        } while(!valid);
+    char temp[5];           // Chuỗi tạm lưu số thứ tự (4 chữ số + '\0')
+    intToPaddedString(temp, num, 4); // Chuyển số thành chuỗi, thêm 0 nếu cần
+    strcpy(code, "DG");     // Gán tiền tố "DG"
+    strcat(code, temp);     // Nối số thứ tự vào mã
 }
 
-// Hàm nhập giới tính
-int inputGender() {
-    int choice;
-    int valid;
-    
-    do {
-        valid = 1;
-        printf("Gioi tinh (Nam / Nu): \n");
-        printf("\t[1]: Nam\n");
-        printf("\t[2]: Nu\n");
-        printf("\tNhap lua chon [ ? ]: ");
-        scanf("%d", &choice);
-        getchar();
+void inputName(char* name, int size) { // Nhập tên độc giả
+    printf("Ho va ten: ");  // Yêu cầu nhập tên
+    fgets(name, size, stdin); // Nhập chuỗi tên từ người dùng
+    name[strcspn(name, "\n")] = '\0'; // Loại bỏ ký tự xuống dòng
+}
 
-        switch (choice) {
-            case 1: 
-                return 1;
-                break;
-            case 2:
-                return 0;
-                break;
-            default:
-                valid = 0;
-                printf("Nhap sai lua chon. Moi nhap lai\n");
+void inputCIC(char* cic, int size) { // Nhập CMND/CCCD
+    int valid;              // Biến kiểm tra tính hợp lệ
+    do {
+        valid = 1;          // Giả định đầu vào hợp lệ
+        printf("CMND/CCCD: "); // Yêu cầu nhập CMND/CCCD
+        fgets(cic, size, stdin); // Nhập chuỗi từ người dùng
+        cic[strcspn(cic, "\n")] = '\0'; // Loại bỏ ký tự xuống dòng
+        
+        if (!isNumber(cic)) { // Kiểm tra chuỗi chỉ chứa số
+            valid = 0;      // Không hợp lệ nếu có ký tự không phải số
+            printf("CMND/CCCD phai la so\n"); // Thông báo lỗi
+            continue;
         }
-    } while (!valid);
-
+        
+        if (findReaderByCIC(cic) != -1) { // Kiểm tra trùng lặp CMND/CCCD
+            valid = 0;      // Không hợp lệ nếu đã tồn tại
+            printf("CMND/CCCD da ton tai trong thu vien\n"); // Thông báo lỗi
+            continue;
+        }
+        
+        switch (strlen(cic)) { // Kiểm tra độ dài CMND/CCCD
+            case 9:         // CMND: 9 số
+            case 12:        // CCCD: 12 số
+                break;
+            default:        // Độ dài không hợp lệ
+                valid = 0;
+                printf("CMND co 9 chu so, CCCD co 12 chu so\n"); // Thông báo lỗi
+        }
+    } while (!valid);   // Lặp lại nếu không hợp lệ
 }
 
-// Hàm kiểm tra email hợp lệ
-int isValidEmail(char* email) {
-    int len = strlen(email);
-    int atCount = 0;      // Đếm số ký tự '@'
-    int dotCount = 0;     // Đếm số ký tự '.' sau '@'
-    int atIndex = -1;     // Vị trí của '@'
-    int i;
+int inputGender() {         // Nhập giới tính độc giả
+    int choice;             // Lựa chọn của người dùng
+    int valid;              // Biến kiểm tra tính hợp lệ
+    do {
+        valid = 1;          // Giả định đầu vào hợp lệ
+        printf("Gioi tinh (Nam / Nu): \n"); // Yêu cầu nhập giới tính
+        printf("\t[1]: Nam\n"); // Lựa chọn 1: Nam
+        printf("\t[2]: Nu\n");  // Lựa chọn 2: Nữ
+        printf("\tNhap lua chon [ ? ]: "); // Yêu cầu nhập số
+        scanf("%d", &choice); // Nhập lựa chọn
+        getchar();          // Xóa ký tự thừa trong bộ đệm
+        
+        switch (choice) {   // Xử lý lựa chọn
+            case 1: return 1; // Nam: trả về 1
+            case 2: return 0; // Nữ: trả về 0
+            default:        // Lựa chọn không hợp lệ
+                valid = 0;
+                printf("Nhap sai lua chon. Moi nhap lai\n"); // Thông báo lỗi
+        }
+    } while (!valid);   // Lặp lại nếu không hợp lệ
+    return 0;           // Giá trị mặc định (không bao giờ chạy đến đây)
+}
 
-    // Kiểm tra độ dài tối thiểu
-    if (len < 6) { // Ví dụ: "a@b.c" là email ngắn nhất hợp lệ
-        return 0;
-    }
-
-    // Kiểm tra ký tự đầu và cuối (không được là ký tự đặc biệt)
-    if (!isalnum(email[0]) || !isalnum(email[len - 1])) {
-        return 0;
-    }
-
-    // Duyệt qua từng ký tự trong email
-    for (i = 0; i < len; i++) {
+int isValidEmail(char* email) { // Kiểm tra email hợp lệ
+    int len = strlen(email);    // Độ dài email
+    int atCount = 0;            // Số ký tự '@'
+    int dotCount = 0;           // Số ký tự '.' sau '@'
+    int atIndex = -1;           // Vị trí của '@'
+    
+    if (len < 6) return 0;      // Độ dài tối thiểu không đủ (ví dụ: a@b.c)
+    if (!isalnum(email[0]) || !isalnum(email[len - 1])) return 0; // Ký tự đầu/cuối không phải chữ/số
+    
+    for (int i = 0; i < len; i++) { // Duyệt qua từng ký tự
         char c = email[i];
-
-        // Đếm '@' và ghi lại vị trí
-        if (c == '@') {
+        if (c == '@') {         // Đếm và lưu vị trí '@'
             atCount++;
             atIndex = i;
         }
-        // Đếm '.' sau '@'
-        else if (c == '.' && atIndex != -1 && i > atIndex) {
+        else if (c == '.' && atIndex != -1 && i > atIndex) { // Đếm '.' sau '@'
             dotCount++;
         }
-        // Kiểm tra ký tự hợp lệ: chữ cái, số, '@', '.', '-', '_'
-        if (!(isalnum(c) || c == '@' || c == '.' || c == '-' || c == '_')) {
+        if (!(isalnum(c) || c == '@' || c == '.' || c == '-' || c == '_')) { // Kiểm tra ký tự hợp lệ
             return 0;
         }
     }
-
-    // Kiểm tra điều kiện hợp lệ
-    if (atCount != 1) { // Phải có đúng 1 '@'
-        return 0;
-    }
-    if (atIndex < 1 || atIndex >= len - 3) { // '@' không được ở đầu hoặc gần cuối
-        return 0;
-    }
-    if (dotCount < 1) { // Phải có ít nhất 1 '.' sau '@'
-        return 0;
-    }
-    if (strstr(email, "..") || strstr(email, "@.") || strstr(email, ".@")) { // Không cho phép ".." hoặc "@." hoặc ".@"
-        return 0;
-    }
-
-    return 1; // Email hợp lệ
+    
+    if (atCount != 1 || atIndex < 1 || atIndex >= len - 3) return 0; // '@' phải có 1 và ở vị trí hợp lệ
+    if (dotCount < 1) return 0; // Phải có ít nhất 1 '.' sau '@'
+    if (strstr(email, "..") || strstr(email, "@.") || strstr(email, ".@")) return 0; // Kiểm tra chuỗi lỗi
+    
+    return 1;               // Email hợp lệ
 }
 
-// Hàm nhập email(email, kích thước)
-void inputEmail(char* email, int size) {
-    int valid;
-    
+void inputEmail(char* email, int size) { // Nhập email độc giả
+    int valid;              // Biến kiểm tra tính hợp lệ
     do {
+        printf("Email: ");  // Yêu cầu nhập email
+        fgets(email, size, stdin); // Nhập chuỗi từ người dùng
+        email[strcspn(email, "\n")] = '\0'; // Loại bỏ ký tự xuống dòng
         
-        printf("Email: ");
-        fgets(email, size, stdin);
-        email[strcspn(email, "\n")] = '\0';
-        
-        valid = isValidEmail(email);
-
-        if (!valid) {
-            printf("Email khong hop le. Moi nhap lai\n");
-        } 
-
-    } while(!valid);
+        valid = isValidEmail(email); // Kiểm tra email hợp lệ
+        if (!valid) {       // Nếu không hợp lệ
+            printf("Email khong hop le. Moi nhap lai\n"); // Thông báo lỗi
+        }
+    } while (!valid);   // Lặp lại nếu không hợp lệ
 }
 
-// Hàm nhập địa chỉ tỉnh(địa chỉ, kích thước)
-int inputProvince() {
-
-    int address;
+int inputProvince() {       // Nhập tỉnh/thành phố
+    int address;            // Chỉ số tỉnh được chọn
     do {
-        address = findItemByStr("Nhap tinh: ", PROVINCES, MAX_PROVINCE);
-
-        if (address == -1) {
-            printf("Khong co dia chi hop le. Moi nhap lai\n");
+        address = findItemByStr("Nhap tinh: ", PROVINCES_DB, MAX_PROVINCE); // Tìm tỉnh trong PROVINCES_DB
+        if (address == -1) { // Nếu không tìm thấy
+            printf("Khong co dia chi hop le. Moi nhap lai\n"); // Thông báo lỗi
         }
-
-    } while(address == -1);
-
-    return address;
+    } while (address == -1); // Lặp lại nếu không hợp lệ
+    return address;         // Trả về chỉ số tỉnh
 }
 
-// Hàm nhập địa chỉ huyện(địa chỉ, kích thước)
-int inputDistrict(int province) {
-    int start = PROVINCE_START_INDEX[province];
-    int end;
-
-    if (province < MAX_PROVINCE - 1) {
-        end = PROVINCE_START_INDEX[province + 1] - 1;
-    } else {
-        end = 712; // Dành cho tỉnh Yên Bái, tỉnh cuối cùng trong danh sách
+int inputDistrict(int province) { // Nhập huyện/quận dựa trên tỉnh
+    int start = PROVINCE_START_INDEX[province]; // Chỉ số bắt đầu của huyện trong DISTRICTS_DB
+    int end = (province < MAX_PROVINCE - 1) ? PROVINCE_START_INDEX[province + 1] - 1 : 712; // Chỉ số kết thúc (712 cho Yên Bái)
+    
+    for (int i = start; i <= end; i++) { // Hiển thị danh sách huyện/quận
+        printf("[%d]: %s\n", i - start + 1, DISTRICTS_DB[i]); // In số thứ tự và tên huyện
     }
-
-    for (int i = start; i <= end; i++) {
-        printf("[%d]: %s\n", i % start + 1, DISTRICTS[i]);
-    }
-
-    int choice;
-    printf("Chon: ");
-    scanf("%d", &choice);
-    return choice + start - 1;
+    
+    int choice;             // Lựa chọn của người dùng
+    printf("Chon: ");       // Yêu cầu nhập lựa chọn
+    scanf("%d", &choice);   // Nhập số thứ tự huyện
+    return start + choice - 1; // Trả về chỉ số huyện trong DISTRICTS_DB
 }
 
-// Thêm đọc giả
-void addReader() {
-    char readerID[MAX_ID];
-    char name[MAX_NAME];
-    char cic[MAX_CIC];
-    int gender;
-    char email[MAX_EMAIL];
-    int province;
-    int district;
-    char birthDate[MAX_DATE];
-    char issueDate[MAX_DATE];
+void addReader() {          // Thêm một độc giả mới vào hệ thống
+    char readerID[MAX_ID];  // Mã ID độc giả mới
+    char name[MAX_NAME];    // Tên độc giả
+    char cic[MAX_CIC];      // CMND/CCCD độc giả
+    int gender;             // Giới tính độc giả
+    char email[MAX_EMAIL];  // Email độc giả
+    int province;           // Chỉ số tỉnh
+    int district;           // Chỉ số huyện
+    char birthDate[MAX_DATE]; // Ngày sinh độc giả
+    char issueDate[MAX_DATE]; // Ngày lập thẻ
     
-    printf("THEM DOC GIA\n");
-
-    generateCodeReader(readerID, IDS[NUMBER_OF_READERS - 1]);
-    printf("%s\n", readerID); // for test
+    printf("THEM DOC GIA\n"); // Tiêu đề chức năng
     
-    inputName(name, MAX_NAME);
-    printf("%s\n", name); // for test
-
-    inputCIC(cic, MAX_CIC);
-    printf("%s\n", cic); // for test
+    generateCodeReader(readerID, IDS[NUMBER_OF_READERS - 1]); // Sinh mã ID dựa trên ID cuối cùng
+    printf("%s\n", readerID); // In mã ID (test)
     
-    gender = inputGender();
-    printf("%d\n", gender); // for test
-
-    inputEmail(email, MAX_EMAIL);
-    printf("%s\n", email); // for test
-
-    province = inputProvince();
-    printf("%d\n", province); // for test
-
-    district = inputDistrict(province);
-    printf("%d\n", district); // for test
-
-    printf("Ngay sinh: \n");
-    inputDay(birthDate);
-    printf("%s\n", birthDate); // for test
-
-    getToday(issueDate);
-    printf("issueDate: %s\n", issueDate); // for test
-
-    if (NUMBER_OF_READERS < MAX_READERS) {
-
-        strcpy(IDS[NUMBER_OF_READERS], readerID);
-        strcpy(NAMES[NUMBER_OF_READERS], name);
-        strcpy(CIC_NUMBERS[NUMBER_OF_READERS], cic);
-        strcpy(BIRTHDAYS[NUMBER_OF_READERS], birthDate);
-        GENDERS[NUMBER_OF_READERS] = gender;
-        strcpy(EMAILS[NUMBER_OF_READERS], email);
-        ADDRESSES_PROVINCES[NUMBER_OF_READERS] = province;
-        ADDRESSES_DISTRICTS[NUMBER_OF_READERS] = district;
-        strcpy(ISSUE_DATES[NUMBER_OF_READERS], issueDate);
+    inputName(name, MAX_NAME); // Nhập tên
+    
+    inputCIC(cic, MAX_CIC);   // Nhập CMND/CCCD
+    
+    gender = inputGender();   // Nhập giới tính
+    
+    inputEmail(email, MAX_EMAIL); // Nhập email
+    
+    province = inputProvince(); // Nhập tỉnh
+    
+    district = inputDistrict(province); // Nhập huyện
+    
+    printf("Nhap ngay sinh: \n");
+    inputDay(birthDate);      // Nhập ngày sinh (hàm từ utils.h)
+    
+    getToday(issueDate);      // Lấy ngày hiện tại làm ngày lập thẻ
+    
+    if (NUMBER_OF_READERS < MAX_READERS) { // Kiểm tra còn chỗ trống
+        strcpy(IDS[NUMBER_OF_READERS], readerID); // Lưu ID
+        strcpy(NAMES[NUMBER_OF_READERS], name);   // Lưu tên
+        strcpy(CIC_NUMBERS[NUMBER_OF_READERS], cic); // Lưu CMND/CCCD
+        strcpy(BIRTHDAYS[NUMBER_OF_READERS], birthDate); // Lưu ngày sinh
+        GENDERS[NUMBER_OF_READERS] = gender;      // Lưu giới tính
+        strcpy(EMAILS[NUMBER_OF_READERS], email); // Lưu email
+        PROVINCES[NUMBER_OF_READERS] = province;  // Lưu chỉ số tỉnh
+        DISTRICTS[NUMBER_OF_READERS] = district;  // Lưu chỉ số huyện
+        strcpy(ISSUE_DATES[NUMBER_OF_READERS], issueDate); // Lưu ngày lập thẻ
         
-        NUMBER_OF_READERS++;
+        NUMBER_OF_READERS++; // Tăng số lượng độc giả
+        printf("Thanh cong\n"); // Thông báo thành công
+    } else {
+        printf("Khong du bo nho\n"); // Thông báo hết bộ nhớ
+    }
+}
+
+// 1.3. CHỈNH SỬA THÔNG TIN ĐỘC GIẢ
+
+int findReaderById(char* id) {  // Tìm độc giả theo ID, trả về chỉ số
+    for (int i = 0; i < NUMBER_OF_READERS; i++) { // Duyệt qua danh sách độc giả
+        if (strcmp(id, IDS[i]) == 0) { // So sánh ID
+            return i;         // Trả về chỉ số nếu tìm thấy
+        }
+    }
+    return -1;                // Trả về -1 nếu không tìm thấy
+}
+
+int findReaderByCIC(char* cic) { // Tìm độc giả theo CMND/CCCD, trả về chỉ số
+    for (int i = 0; i < NUMBER_OF_READERS; i++) { // Duyệt qua danh sách độc giả
+        if (strcmp(cic, CIC_NUMBERS[i]) == 0) { // So sánh CMND/CCCD
+            return i;         // Trả về chỉ số nếu tìm thấy
+        }
+    }
+    return -1;                // Trả về -1 nếu không tìm thấy
+}
+
+void editReaderInfor() {      // Chỉnh sửa thông tin độc giả
+    char id[MAX_ID];          // ID độc giả cần chỉnh sửa
+    int choice;               // Lựa chọn mục cần chỉnh sửa
+    
+    printf("Nhap id cua doc gia: "); // Yêu cầu nhập ID
+    scanf("%s", id);          // Nhập ID
+    getchar();                // Xóa ký tự thừa
+    
+    int index = findReaderById(id); // Tìm chỉ số độc giả
+    if (index == -1) {        // Nếu không tìm thấy
+        printf("Khong tim thay doc gia co id: %s\n", id); // Thông báo lỗi
+        return;
+    }
+    
+    do {                      // Menu chỉnh sửa
+        system("cls");        // Xóa màn hình
+        printf("THONG TIN DOC GIA\n"); // Tiêu đề
+        viewReaderHeader();   // In tiêu đề bảng
+        viewReader(index);    // In thông tin độc giả
+        printf("\n");
         
-        printf("Thanh cong\n");
-    } else {
-        printf("Khong du bo nho\n");
-    }
-
+        printf("[1]: Ho va ten\n"); // Lựa chọn chỉnh tên
+        printf("[2]: CMND/CCCD\n"); // Lựa chọn chỉnh CMND/CCCD
+        printf("[3]: Ngay sinh\n"); // Lựa chọn chỉnh ngày sinh
+        printf("[4]: Gioi tinh\n"); // Lựa chọn chỉnh giới tính
+        printf("[5]: Email\n");     // Lựa chọn chỉnh email
+        printf("[6]: Dia chi\n");   // Lựa chọn chỉnh địa chỉ
+        printf("[0]: Thoat\n");     // Thoát menu
+        
+        printf("Chon muc can dieu chinh [ ? ]: "); // Yêu cầu nhập lựa chọn
+        scanf("%d", &choice); // Nhập lựa chọn
+        getchar();            // Xóa ký tự thừa
+        
+        switch (choice) {     // Xử lý lựa chọn
+            case 0: break;    // Thoát
+            case 1:           // Chỉnh tên
+                printf("Ho va ten: ");
+                fgets(NAMES[index], MAX_NAME, stdin);
+                NAMES[index][strcspn(NAMES[index], "\n")] = '\0';
+                break;
+            case 2:           // Chỉnh CMND/CCCD
+                printf("CMND/CCCD: ");
+                inputCIC(CIC_NUMBERS[index], MAX_CIC);
+                break;
+            case 3:           // Chỉnh ngày sinh
+                printf("Ngay sinh: ");
+                inputDay(BIRTHDAYS[index]);
+                break;
+            case 4:           // Chỉnh giới tính
+                printf("Gioi tinh: ");
+                GENDERS[index] = inputGender();
+                break;
+            case 5:           // Chỉnh email
+                printf("Email: ");
+                inputEmail(EMAILS[index], MAX_EMAIL);
+                break;
+            case 6:           // Chỉnh địa chỉ
+                printf("Dia chi: ");
+                PROVINCES[index] = inputProvince();
+                DISTRICTS[index] = inputDistrict(PROVINCES[index]);
+                break;
+            default:          // Lựa chọn không hợp lệ
+                printf("Nhap sai lua chon. Moi ban nhap lai\n");
+        }
+    } while (choice != 0); // Lặp lại đến khi thoát
 }
 
-// Tìm đọc giả bằng id (id): hàm trả về index của đọc giả
-int findReaderById(char* id) {
-    int index = -1;
+// 1.4. XÓA THÔNG TIN ĐỘC GIẢ
 
-    for (int i = 0; i < NUMBER_OF_READERS; i++) {
-        if (strcmp(id, IDS[i]) == 0) {
-            index = i;
-            break;
+void deleteReader() {         // Xóa một độc giả khỏi hệ thống
+    char id[MAX_ID];          // ID độc giả cần xóa
+
+    printf("Nhap ID cua doc gia: "); // Yêu cầu nhập ID
+    fgets(id, MAX_ID, stdin); // Nhập ID
+    id[strcspn(id, "\n")] = '\0'; // Loại bỏ ký tự xuống dòng
+    
+    int index = findReaderById(id); // Tìm chỉ số độc giả
+    if (index == -1) {        // Nếu không tìm thấy
+        printf("Khong tim thay doc gia co ID: %s\n", id); // Thông báo lỗi
+        return;
+    }
+    
+    for (int i = index; i < NUMBER_OF_READERS - 1; i++) { // Dịch chuyển dữ liệu để xóa
+        strcpy(IDS[i], IDS[i + 1]); // Dịch ID
+        strcpy(NAMES[i], NAMES[i + 1]); // Dịch tên
+        strcpy(CIC_NUMBERS[i], CIC_NUMBERS[i + 1]); // Dịch CMND/CCCD
+        strcpy(BIRTHDAYS[i], BIRTHDAYS[i + 1]); // Dịch ngày sinh
+        GENDERS[i] = GENDERS[i + 1]; // Dịch giới tính
+        strcpy(EMAILS[i], EMAILS[i + 1]); // Dịch email
+        PROVINCES[i] = PROVINCES[i + 1]; // Dịch tỉnh
+        DISTRICTS[i] = DISTRICTS[i + 1]; // Dịch huyện
+        strcpy(ISSUE_DATES[i], ISSUE_DATES[i + 1]); // Dịch ngày lập thẻ
+    }
+    
+    NUMBER_OF_READERS--;      // Giảm số lượng độc giả
+    printf("Xoa thanh cong doc gia %s\n", id); // Thông báo thành công
+}
+
+// 1.5. TÌM KIẾM ĐỘC GIẢ THEO CMND/CCCD
+
+void searchReaderByCIC() {    // Tìm kiếm độc giả theo CMND/CCCD
+    char cic[13];             // Chuỗi lưu CMND/CCCD (tối đa 12 số + '\0')
+    
+    printf("Nhap CMND cua doc gia: "); // Yêu cầu nhập CMND/CCCD
+    fgets(cic, sizeof(cic), stdin); // Nhập chuỗi
+    cic[strcspn(cic, "\n")] = '\0'; // Loại bỏ ký tự xuống dòng
+    
+    printf("%s\n", cic);      // In CMND/CCCD (test)
+    
+    int index = findReaderByCIC(cic); // Tìm chỉ số độc giả
+    printf("KET QUA\n");      // Tiêu đề kết quả
+    
+    if (index != -1) {        // Nếu tìm thấy
+        viewReaderHeader();   // In tiêu đề bảng
+        viewReader(index);    // In thông tin độc giả
+        printf("\n");
+    } else {                  // Nếu không tìm thấy
+        printf("Khong tim thay doc gia co CMND/CCCD: %s\n", cic); // Thông báo lỗi
+    }
+}
+
+// 1.6. TÌM KIẾM ĐỘC GIẢ THEO HỌ TÊN
+
+void searchReaderByName() {   // Tìm kiếm độc giả theo tên
+    char source[20];          // Chuỗi tên nhập vào
+    char des[20];             // Chuỗi tên chuyển thành chữ thường
+    int saveIndex[20];        // Mảng lưu chỉ số các độc giả tìm thấy
+    int index = 0;            // Số lượng độc giả tìm thấy
+    
+    printf("Nhap ten doc gia: "); // Yêu cầu nhập tên
+    fgets(source, sizeof(source), stdin); // Nhập chuỗi tên
+    source[strcspn(source, "\n")] = '\0'; // Loại bỏ ký tự xuống dòng
+    
+    convertToLower(source, des); // Chuyển tên nhập vào thành chữ thường
+    
+    for (int i = 0; i < NUMBER_OF_READERS; i++) { // Duyệt qua danh sách độc giả
+        char temp[20];        // Chuỗi tạm lưu tên độc giả (chữ thường)
+        convertToLower(NAMES[i], temp); // Chuyển tên độc giả thành chữ thường
+        
+        if (findSubString(des, temp) != -1) { // Kiểm tra tên nhập vào có trong tên độc giả
+            saveIndex[index++] = i; // Lưu chỉ số độc giả
+            printf("%d. %s\n", index, NAMES[i]); // In số thứ tự và tên
         }
     }
-
-    return index;
-}
-
-// Tìm đọc giả bằng CMND/CCCD(CMND/CCCD): hàm trả về index của đọc giả
-int findReaderByCIC(char* cic) {
-    int index;
     
-
-    for (int i = 0; i < NUMBER_OF_READERS; i++) {
-        index = i;
-
-        int valid = strcmp(cic, CIC_NUMBERS[i]);
-
-        if (valid == 0) {
-            break;
-        } else {
-            index = -1;
-        }
-    }
-
-    return index;
-}
-
-// 1.3. CHỈNH SỬA THÔNG TIN MỘT ĐỘC GIẢ 
-void editReaderInfor() {
-    char id[MAX_ID];
-    int choice;
-
-    printf("Nhap id cua doc gia: ");
-    scanf("%s", &id);
-    getchar();
-
-    int index = findReaderById(id);
-    
-    if (index == -1) {
-        printf("Khong tim thay doc gia co id: %s\n", id);
-    } else {
-        do {
-            system("cls");
-
-            printf("THONG TIN DOC GIA\n");
-            viewReaderHeader();
-            viewReader(index);
-            printf("\n");
-
-            printf("[1]: Ho va ten\n");
-            printf("[2]: CMND/CCCD\n");
-            printf("[3]: Ngay sinh\n");
-            printf("[4]: Gioi tinh\n");
-            printf("[5]: Email\n");
-            printf("[6]: Dia chi\n");
-            printf("[0]: Thoat\n");
-
-            printf("Chon muc can dieu chinh [ ? ]: ");
-            scanf("%d", &choice);
-            getchar();
-            
-            switch(choice) {
-                case 0:
-                    break;
-                case 1:
-                    printf("Ho va ten: ");
-                    fgets(NAMES[index], MAX_NAME, stdin);
-                    NAMES[index][strcspn(NAMES[index], "\n")] = '\0';
-                    break;
-                case 2:
-                    printf("CMND/CCCD: ");
-                    inputCIC(CIC_NUMBERS[index], MAX_CIC);
-                    break;
-                case 3:
-                    printf("Ngay sinh: ");
-                    inputDay(BIRTHDAYS[index]);
-                    break;
-                case 4:
-                    printf("Gioi tinh: ");
-                    GENDERS[index] = inputGender();
-                    break;
-                case 5:
-                    printf("Email: ");
-                    inputEmail(EMAILS[index], MAX_EMAIL);
-                    break;
-                case 6:
-                    printf("Dia chi: ");
-                    ADDRESSES_PROVINCES[index] = inputProvince();
-                    ADDRESSES_DISTRICTS[index] = inputDistrict(ADDRESSES_PROVINCES[index]);
-                    break;
-                default:
-                    printf("Nhap sai lua chon. Moi ban nhap lai\n");
-            }
-        } while (choice != 0);   
-    }
-}
-
-// 1.4. XÓA THÔNG TIN MỘT ĐỘC GIẢ 
-void deleteReader() {
-    char id[MAX_ID];
-
-    getchar();
-    printf("Nhap ID cua doc gia: ");
-
-    fgets(id, MAX_ID, stdin);
-    id[strcspn(id, "\n")] = '\0';
-
-    int index = findReaderById(id);
-
-    if (index != -1) {
-        // xoá không duy trì thứ tự trong mảng
-        // Xoá duy trì thứ tự trong mảng
-        for (int i = index; i < NUMBER_OF_READERS - 1; i++) {
-            strcpy( IDS[index], IDS[i  + 1]);
-            strcpy( NAMES[index], NAMES[i  + 1]);
-            strcpy( CIC_NUMBERS[index], CIC_NUMBERS[i  + 1]);
-            strcpy( BIRTHDAYS[index], BIRTHDAYS[i  + 1]);
-            GENDERS[index] = GENDERS[i  + 1];
-            strcpy( EMAILS[index], EMAILS[i  + 1]);
-            ADDRESSES_PROVINCES[index] = ADDRESSES_PROVINCES[i  + 1];
-            ADDRESSES_DISTRICTS[index] = ADDRESSES_DISTRICTS[i  + 1];
-            strcpy( ISSUE_DATES[index], ISSUE_DATES[i  + 1]);
-        }
-    
-        NUMBER_OF_READERS--;
-
-        printf("Xoa thanh cong doc gia %s\n", id);
-    } else {
-        printf("Khong tim thay doc gia co ID: %s\n", id);
-    }
-}
-
-// 1.5. TÌM KIẾM ĐỘC GIẢ THEO CMND (CIC: Tiếng Anh của CMND/CCCD)
-void searchReaderByCIC() {
-    char cic[13];
-
-    getchar();
-    printf("Nhap CMND cua doc gia: ");
-    fgets(cic, sizeof(cic), stdin);
-    cic[strcspn(cic, "\n")] = '\0';
-
-    printf("%s\n", cic);
-    
-    int index = findReaderByCIC(cic);
-
-    printf("KET QUA\n");
-
-    if (index != -1) {
-        viewReaderHeader();
-        viewReader(index);
-
-    printf("\n");
-    } else {
-        printf("Khong tim thay doc gia co CMND/CCCD: %s\n", cic);
-    }
-}
-
-// 1.6. TÌM KIẾM SÁCH THEO HỌ TÊN
-void searchReaderByName() {
-    char source[20];
-    char des[20];
-    int saveIndex[20];
-    int index = 0;
-    int valid;
-
-    getchar();
-    printf("Nhap ten doc gia: ");
-    fgets(source, sizeof(source), stdin);
-    source[strcspn(source, "\n")] = '\0';
-
-    convertToLower(source, des);
-
-    for (int i = 0; i < MAX_PROVINCE; i++) {
-        char temp[20];
-        convertToLower(NAMES[i], temp);
-
-        valid = findSubString(des, temp);
-
-        if (valid != -1) {
-            saveIndex[index++] = i;
-
-            // hiển thị ra màn hình
-            printf("%d. %s\n", index, NAMES[i] );
-        }
-
-    }
-
-    if(index == 0) {
-        printf("Khong co\n");
-    } else {
-        int choice;
-        printf("Chon doc gia: ");
-        scanf("%d", &choice);
-        viewReaderHeader();
-        viewReader(saveIndex[choice - 1]);
+    if (index == 0) {         // Nếu không tìm thấy
+        printf("Khong co\n"); // Thông báo không có kết quả
+    } else {                  // Nếu tìm thấy
+        int choice;           // Lựa chọn độc giả
+        printf("Chon doc gia: "); // Yêu cầu chọn
+        scanf("%d", &choice); // Nhập lựa chọn
+        viewReaderHeader();   // In tiêu đề bảng
+        viewReader(saveIndex[choice - 1]); // In thông tin độc giả được chọn
     }
 }
