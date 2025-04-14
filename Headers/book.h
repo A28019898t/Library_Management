@@ -1,34 +1,38 @@
-#ifndef BOOK_H
-#define BOOK_H
+#ifndef BOOK_H                  // Ngăn chặn việc bao gồm file header nhiều lần (include guard)
+#define BOOK_H                  // Định nghĩa macro đánh dấu file header đã được bao gồm
 
-// XEM DANH SÁCH CÁC SÁCH TRONG THƯ VIỆN 
-// Hiển thị Header
-void viewBookHeader();
-// Hiển thị 1 đọc giả dựa trên index
-void viewBook(int index);
-// hiển thị toàn bộ đọc giả
-void viewAllBooks();
+// 2. QUẢN LÝ SÁCH
 
-// THÊM SÁCH
+// 2.1. XEM DANH SÁCH SÁCH TRONG THƯ VIỆN
 
-// Hàm nhập thể loại sách
-int inputCategory(char* str);
+void viewBookHeader();          // Hiển thị tiêu đề bảng danh sách sách (ISBN, tiêu đề, tác giả, v.v.)
 
-void addBook();
+void viewBook(int index);       // Hiển thị thông tin một cuốn sách dựa trên chỉ số trong mảng ISBNs
 
-// Tìm sách dựa trên mã isbn của sách
-int findBookByISBN(char* isbn);
+void viewAllBooks();            // Hiển thị toàn bộ danh sách sách hiện có trong hệ thống
 
-// CHỈNH SỬA THÔNG TIN MỘT QUYỂN SÁCH 
-void editInfoBook();
+// 2.2. THÊM SÁCH
 
-// XÓA THÔNG TIN SÁCH 
-void deleteBook();
+void addBook();                 // Thêm một cuốn sách mới vào các mảng dữ liệu toàn cục
 
-// TÌM KIẾM SÁCH THEO ISBN 
-void searchBookByISBN();
+// Hàm tìm kiếm hỗ trợ
 
-// TÌM KIẾM SÁCH THEO TÊN SÁCH
-void searchBookByTitle();
+int findBookByISBN(char* isbn); // Tìm sách theo ISBN, trả về chỉ số trong ISBNs hoặc -1 nếu không thấy
 
-#endif
+// 2.3. CHỈNH SỬA THÔNG TIN SÁCH
+
+void editInfoBook();            // Chỉnh sửa thông tin sách (tiêu đề, tác giả, giá, v.v.) dựa trên tên sách
+
+// 2.4. XÓA THÔNG TIN SÁCH
+
+void deleteBook();              // Xóa một cuốn sách khỏi hệ thống theo tên hoặc ISBN, dịch chuyển mảng
+
+// 2.5. TÌM KIẾM SÁCH THEO ISBN
+
+void searchBookByISBN();        // Tìm và hiển thị sách theo ISBN nhập vào
+
+// 2.6. TÌM KIẾM SÁCH THEO TÊN
+
+void searchBookByTitle();       // Tìm và hiển thị danh sách sách theo tiêu đề (tìm chuỗi con)
+
+#endif                          // Kết thúc include guard

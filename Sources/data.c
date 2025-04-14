@@ -1208,14 +1208,14 @@ int STOCKS[MAX_BOOKS] = {               // Mảng lưu số lượng sách trong
 int NUMBER_OF_BOOKS = 100;                // Số lượng sách hiện có trong hệ thống (dựa trên ISBN)
 
 // KHỞI TẠO MẢNG LƯU THÔNG TIN PHIẾU MƯỢN
-char BORROW_IDS[MAX_BORROW_TICKET][MAX_ID] = { // Mảng 2D lưu ID độc giả trong phiếu mượn
-    "DG001",                            // ID độc giả phiếu 1
-    "DG002",                            // ID độc giả phiếu 2
-    "DG001"                             // ID độc giả phiếu 3
+int BORROW_IDS[MAX_BORROW_TICKET] = { // Mảng 2D lưu ID độc giả trong phiếu mượn
+    0,                            // ID độc giả phiếu 1
+    1,                            // ID độc giả phiếu 2
+    0                             // ID độc giả phiếu 3
 };
 
 char BORROW_DATE[MAX_BORROW_TICKET][MAX_DATE] = { // Mảng 2D lưu ngày mượn sách (DD/MM/YYYY)
-    "25/03/2025",                       // Ngày mượn phiếu 1
+    "27/03/2025",                       // Ngày mượn phiếu 1
     "26/03/2025",                       // Ngày mượn phiếu 2
     "04/04/2025"                        // Ngày mượn phiếu 3
 };
@@ -1226,13 +1226,7 @@ int BORROW_START[MAX_BORROW_TICKET] = { // Mảng lưu chỉ số bắt đầu c
     5                                   // Phiếu 3: Bắt đầu từ sách 5
 };
 
-int BORROW_END[MAX_BORROW_TICKET] = {   // Mảng lưu chỉ số kết thúc của sách mượn trong BORROW_ISBN_BOOKS
-    1,                                  // Phiếu 1: Kết thúc tại sách 1
-    4,                                  // Phiếu 2: Kết thúc tại sách 4
-    6                                   // Phiếu 3: Kết thúc tại sách 6
-};
-
-int BORROW_ISBN_BOOKS[MAX_BORROW_TICKET] = { // Mảng lưu ISBN sách mượn (danh sách dựa vào index của sách đã lưu trong ISBN sách)
+int BORROW_BOOKS[MAX_BORROW_TICKET] = { // Mảng lưu ISBN sách mượn (danh sách dựa vào index của sách đã lưu trong ISBN sách)
     0,                // Sách mượn 0 (phiếu 1)
     1,                // Sách mượn 1 (phiếu 1)
     2,                // Sách mượn 2 (phiếu 2)
@@ -1244,4 +1238,6 @@ int BORROW_ISBN_BOOKS[MAX_BORROW_TICKET] = { // Mảng lưu ISBN sách mượn (
 
 int NUMBER_OF_BORROW_TICKETS = 3;       // Số lượng phiếu mượn hiện có trong hệ thống
 
-int NUMBER_OF_ISBN_BOOK = 7;            // Số lượng sách (ISBN) đang được mượn trong thư viện
+int NUMBER_OF_BORROW_BOOK = 7;            // Số lượng sách (ISBN) đang được mượn trong thư viện
+
+int BLACK_LIST[MAX_READERS] = {0};       // Mảng lưu danh sách các đọc giả thường xuyên mất sách

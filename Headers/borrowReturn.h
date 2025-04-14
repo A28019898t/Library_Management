@@ -1,32 +1,32 @@
-#ifndef BORROWRETURN_H
-#define BORROWRETURN_H
+#ifndef BORROWRETURN_H            // Ngăn chặn việc bao gồm file header nhiều lần (include guard)
+#define BORROWRETURN_H            // Định nghĩa macro đánh dấu file header đã được bao gồm
 
-#include "..\Headers\data.h"
+#include "..\Headers\data.h"      // File header chứa định nghĩa dữ liệu và mảng toàn cục
 
+// 4. QUẢN LÝ MƯỢN TRẢ SÁCH
 
-// LẬP PHIẾU MƯỢN SÁCH  
-void createBorrowTicket();
+// 4.1. LẬP PHIẾU MƯỢN SÁCH
 
-// tìm thông tin của đọc giả trong dữ liệu mượn sách.
-int findReaderBorrowBooksByID(char* id, int result[]);
+void createBorrowTicket();        // Tạo phiếu mượn sách mới, cập nhật BORROW_IDS, BORROW_ISBN_BOOKS, v.v.
 
-// xoá thông tin trong danh sách mượn sách; và lưu thông tin trong danh sách trả sách để theo dõi và trích xuất thông tin khi cần thiết
-void deleteBorrowTicketByIndex(int index);
+// Hàm hỗ trợ quản lý mượn trả
 
-// lưu vào trong mảng returnTickets
-void storeReturnTicketData(char* readerId, char* bookId, char* borrowDate, char* returnDate, char* realReturnDate, wchar_t lossBook, int forfeit);
+int findReaderBorrowBooksByID(char* id, int result[]); // Tìm phiếu mượn của độc giả theo ID, trả về số lượng phiếu
 
-// Loại bỏ phẩn tử của BORROW_ISBN_BOOKS ở bất kỳ vị trí nào 
-int removeElementBorrowBook(char arr[][MAX_ISBN], int length, int position);
+void deleteBorrowTicketByIndex(int index); // Xóa phiếu mượn tại chỉ số index, dịch chuyển dữ liệu
 
-// Loại bỏ phẩn tử của BOOK_IDS ở bất kỳ vị trí nào 
-int removeElementBorrowReader(char arr[][MAX_ID], int length, int position);
+int removeElementBorrowBook(char arr[][MAX_ISBN], int length, int position); // Xóa phần tử trong mảng BORROW_ISBN_BOOKS, trả về độ dài mới
 
-// Loại bỏ phẩn tử của BORROW_START / END ở bất kỳ vị trí nào 
-int removeElementBorrowPos(int arr[], int length, int position);
+int removeElementBorrowReader(char arr[][MAX_ID], int length, int position); // Xóa phần tử trong mảng BORROW_IDS, trả về độ dài mới
 
+int removeElementBorrowPos(int arr[], int length, int position); // Xóa phần tử trong mảng BORROW_START/END, trả về độ dài mới
 
-// LẬP PHIẾU TRẢ SÁCH
-void createReturnTicket();
+void viewBorrowHeader(); // Hiển thị dòng tiêu đề của danh sách mượn sách
 
-#endif
+int viewBorrowBook(int seq, char* isbn, char* title, char* borrowDate); // Hiển thị sách đã mượn
+
+// 4.2. LẬP PHIẾU TRẢ SÁCH
+
+void createReturnTicket();        // Tạo phiếu trả sách, xóa sách khỏi BORROW_ISBN_BOOKS và cập nhật kho
+
+#endif                            // Kết thúc include guard

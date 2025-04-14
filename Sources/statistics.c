@@ -1,6 +1,7 @@
 #include <stdio.h>              // Thư viện chuẩn cho nhập/xuất dữ liệu
 
 #include "..\Headers\data.h"    // File header chứa định nghĩa dữ liệu và mảng toàn cục
+#include "..\Headers\utils.h"
 
 // 3. THỐNG KÊ
 
@@ -58,13 +59,41 @@ void countTotalReadersByGender() { // Đếm số lượng độc giả theo gi�
 // 3.5. THỐNG KÊ SỐ SÁCH ĐANG ĐƯỢC MƯỢN
 
 void countTotalBorrowedBooks() { // Đếm tổng số sách đang được mượn
-    printf("Tong so sach dang duoc muon: %d\n", NUMBER_OF_ISBN_BOOK); // In số lượng từ biến toàn cục
+    printf("Tong so sach dang duoc muon: %d\n", NUMBER_OF_BORROW_BOOK); // In số lượng từ biến toàn cục
 }
 
 // 3.6. THỐNG KÊ DANH SÁCH ĐỘC GIẢ BỊ TRỄ HẠN
 
 void listOverdueReaders() {     // Liệt kê danh sách độc giả trễ hạn (chưa triển khai)
-    printf("Danh sach doc gia tre han:\n"); // Tiêu đề danh sách
-    // TODO: Thêm logic kiểm tra ngày trả (BORROW_RETURN_DATE) so với ngày hiện tại
-    printf("Chuc nang chua duoc trien khai\n"); // Thông báo tạm thời
+    int temp[MAX_BORROW_TICKET] = {0};
+    int borrowReaders[MAX_BORROW_TICKET];
+    int indexBorrowReaders = 0;
+
+    for(int i = 0; i < NUMBER_OF_BORROW_TICKETS; i++) {
+        char today[MAX_DATE];
+
+        getToday(today);
+        int late = dateDifference(BORROW_DATE[i], today) - 7;
+
+        if(late > 0) {
+            int pos = findNumber(borrowReaders, indexBorrowReaders, BORROW_IDS[i]);
+            if(pos == -1) { // Không tìm thấy
+                borrowReaders[indexBorrowReaders] = BORROW_IDS[i]; // Thêm id mới vào
+                temp[indexBorrowReaders]++;
+                indexBorrowReaders++;
+            } else {
+                temp[pos]++;
+            }
+
+        }
+    }
+
+    printf("DANH SACH DOC GIA BI TRE HAN\n");
+
+    printf("%-5s%-40s%-10s\n", "STT", "Ho va ten", "So sach bi tre han");
+
+    int result[MAX_BORROW_TICKET];
+    for (int i = 0;i < indexBorrowReaders; i++) {
+        printf("%-5d%-40s%-10d\n", i + 1, NAMES[borrowReaders[i]], temp[i]);
+    }
 }

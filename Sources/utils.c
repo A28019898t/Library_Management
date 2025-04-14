@@ -32,6 +32,14 @@ int isNumber(char* str) {       // Kiểm tra chuỗi chỉ chứa số
     return 1;                   // Chuỗi toàn số
 }
 
+int findNumber(int arr[], int size, int num) {
+    for (int i = 0; i < size; i++) {
+        if (arr[i] == num) return i;
+    }
+
+    return -1;
+}
+
 // Hàm xử lý ngày tháng
 
 int isLeapYear(int year) {      // Kiểm tra năm nhuận
@@ -142,6 +150,41 @@ void getDateFromKDays(char* date, char* result, int kDays) { // Tính ngày sau 
         }
     }
     getDate(result, day, month, year); // Tạo chuỗi ngày kết quả
+}
+
+int dateDifference(char* date1, char* date2) { // Tính khoảng cách (số ngày) giữa hai ngày dạng DD/MM/YYYY
+    int day1, month1, year1;
+    int day2, month2, year2;
+
+    convertDateToInt(date1, &day1, &month1, &year1);
+    convertDateToInt(date2, &day2, &month2, &year2);
+    
+    int total = 0;
+    int gapMonth = 0;
+
+    for (int i = year1; i < year2; i++) {
+        total = total + (isLeapYear(i) ? 366 : 365);
+    }
+
+    if (month2 == month1) {
+        gapMonth = day2 - day1;
+    } else if (month2 > month1) {
+        gapMonth = day2 + MONTHS[month1 - 1] - day1;
+        for(int i = month1 + 1; i < month2; i++) {
+            gapMonth = gapMonth + MONTHS[i - 1];
+        }
+    } else {
+        gapMonth = day1 + MONTHS[month2 - 1] - day2;
+
+        for (int i = month2 + 1; i < month1; i++) {
+            gapMonth = gapMonth + MONTHS[i - 1];
+        }
+
+        gapMonth = -gapMonth;
+    }
+
+    
+    return total + gapMonth;
 }
 
 // Hàm xử lý chuỗi
